@@ -1,11 +1,21 @@
 import Vapor
 
 func routes(_ app: Application) throws {
-    app.get { req in
-        return "It works!"
+    
+    var queue: PriorityQueue<Person> = PriorityQueue()
+    
+    app.post("user") { req -> Int in
+        guard let person = try? req.content.decode(Person.self) else {
+            return 400
+        }
+        print("Successfully decoded input json \(person)")
+        if queue.enqueue(person){
+            return 200
+        }
+        return 400
     }
-
-    app.get("hello") { req -> String in
-        return "Hello, world!"
+    
+    app.get("user") { req -> [Person] in
+        return queue.arr
     }
 }
